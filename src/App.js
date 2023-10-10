@@ -110,7 +110,7 @@ less /etc/passwd | grep bootcamper
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'script.sh';
+    a.download = 'instructor_script.sh';
     a.click();
     window.URL.revokeObjectURL(url);
   };
