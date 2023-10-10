@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/script-generator-cpst2Hosting/static/css/main.08a1eeb3.css",
+    "main.js": "/script-generator-cpst2Hosting/static/js/main.8c0e349d.js",
+    "index.html": "/script-generator-cpst2Hosting/index.html",
+    "main.08a1eeb3.css.map": "/script-generator-cpst2Hosting/static/css/main.08a1eeb3.css.map",
+    "main.8c0e349d.js.map": "/script-generator-cpst2Hosting/static/js/main.8c0e349d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.08a1eeb3.css",
+    "static/js/main.8c0e349d.js"
+  ]
+}
