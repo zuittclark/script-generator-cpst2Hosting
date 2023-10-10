@@ -52,7 +52,7 @@ h2 {
   background-color: aquamarine !important;
 }
 
-code {
+.script-code {
   display: inline-block;
   padding: 1rem .8rem;
   text-align: start;
@@ -71,4 +71,34 @@ code {
   padding: 10px; /* Add padding for better readability */
   border: 1px solid #ccc; /* Add a border for separation */
   border-radius: 10px;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.main-content-container {
+  min-height: 50vh;
+}
+
+.tut {
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  text-align: start;
+}
+
+
+
+.footer-code {
+  display: inline-block;
+  background-color: rgb(46, 46, 46);
+  padding: 8px;
+  margin-top: .1rem;
+  border-radius: 5px;
+}
+
+[disabled] {
+  background-color: #c9c9c9;
+  color: #464646;
 }

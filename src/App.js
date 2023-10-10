@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Papa from 'papaparse';
+import {uploadScriptToCloud} from './storage/cloud'
 
 function App() {
   
@@ -8,10 +9,12 @@ function App() {
   const [code, setCode] = useState("");
   const [codeText, setCodeText] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-
+  const [isHidden, setIsHidden] = useState(true)
+  const [isLoadingButton, setIsLoadingButton] = useState(false)
 
   function getDataFromSheet(){
     setIsLoading(true);
+    setIsHidden(true);
     setData([]);
     setCode("");
     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSu2vC1xE-Zm11fwv0Nkd9r0hRqiIYCBHnPZsScIkQf_mqglwFMeSxXWRwq61-l1L4-hYzm53d8duzL/pub?output=csv')
@@ -42,7 +45,7 @@ function App() {
     console.log("Test", data)
     let script = (
       <>
-        <code className='code-container'>
+        <code className='script-code code-container'>
         
           #!/bin/bash <br />
           {data.map(item => (
@@ -53,10 +56,10 @@ function App() {
               #- Setup ssh key for bootcamper<br />
               sudo mkdir -p /home/bootcamper{item.id}/.ssh/<br />
               sudo touch /home/bootcamper{item.id}/.ssh/authorized_keys<br />
+              sudo sh -c 'echo ${ `"${item.sshKey}" >>`} /home/bootcamper{item.id}/.ssh/authorized_keys'<br />
               sudo chown -R bootcamper{item.id}:bootcamper /home/bootcamper{item.id}/.ssh/<br />
               sudo chmod 644 /home/bootcamper{item.id}/.ssh/authorized_keys<br />
               sudo chmod 700 /home/bootcamper{item.id}/.ssh/<br />
-              sudo echo { `"${item.sshKey}" >>`} /home/bootcamper1/.ssh/authorized_keys <br />
             
             </div>
           
@@ -85,10 +88,10 @@ sudo useradd --create-home --shell /bin/bash --gid bootcamper --comment "${item.
 #- Setup ssh key for bootcamper
 sudo mkdir -p /home/bootcamper${item.id}/.ssh/
 sudo touch /home/bootcamper${item.id}/.ssh/authorized_keys
+sudo sh -c 'echo ${ `"${item.sshKey}" >>`} /home/bootcamper${item.id}/.ssh/authorized_keys'
 sudo chown -R bootcamper${item.id}:bootcamper /home/bootcamper${item.id}/.ssh/
 sudo chmod 644 /home/bootcamper${item.id}/.ssh/authorized_keys
 sudo chmod 700 /home/bootcamper${item.id}/.ssh/
-sudo echo ${ `"${item.sshKey}" >>`} /home/bootcamper1/.ssh/authorized_keys
 `
 )).join('\n')
 }
@@ -119,6 +122,9 @@ less /etc/passwd | grep bootcamper
     getDataFromSheet()
   }, [])
 
+  const uploadToDropBox = () => {
+
+  }
 
   // console.log(codeText)
   return (
@@ -131,21 +137,39 @@ less /etc/passwd | grep bootcamper
       </div>
       :
       <>
+      <div class="main-content-container">
         <a className='add-link' href="https://docs.google.com/spreadsheets/d/1pKiEQtIMg__GtYmkLzjNuNVCBBVTm_ZJgdi-tN0IdoU/edit?usp=sharing" target='_blank'>Update Bootcamper Data</a>
         <div className='mt'>
           <button className='btn green' onClick={getDataFromSheet}>REFRESH</button>
           <button className='btn' onClick={() => generateBashScript(data)}><strong>GENERATE SCRIPT</strong></button>
           <button className='btn' onClick={downloadShellScript}>Download script</button>
+          <button className='btn' disabled={isLoadingButton ? true : false} onClick={() => uploadScriptToCloud(codeText, setIsHidden, setIsLoadingButton)}>
+            {isLoadingButton ?
+              "Generating link..."
+            :
+              "Get Script Link"
+            }
+          </button>
         </div>
+        <br />
+        <code class="footer-code" style={{display: isHidden ? "none" : "inline-block"}}>curl -sSf https://f005.backblazeb2.com/file/script-aws-setup/instructor_script.sh | bash</code>
         <div className='container'>
           <pre>
             {code}
           </pre>
+          
         </div>
+      </div>
+      <div className="center"> 
+        <div className="tut">
+          <h3>To add script to the remote server:</h3>
+          <p>Open terminal to the location of instructor_script.sh</p>
+          <code class="footer-code">
+            scp -i ~/.ssh/zuitt_keypair_us_east2.pem instructor_script.sh ubuntu@{"<aws_server_domain_name>"}:~/
+          </code>
+        </div>
+      </div>
       </>
-
-
-
       }
 
     </div>
