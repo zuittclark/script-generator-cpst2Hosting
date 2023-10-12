@@ -1,8 +1,8 @@
 
-export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton) => {
+export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton, setErrorMessage) => {
     
     setIsLoadingButton(true);
-
+    setErrorMessage(null);
     const authorizationHeaders = {
         Authorization: 'Basic ' + btoa('0055c1dffd9a6620000000001:K005/rdzb3GGfdw8e+3OZMqsfP2nHd4')
       };
@@ -36,6 +36,8 @@ export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton) =
 
       })
       .catch(error => {
+        setIsLoadingButton(false);
+        setErrorMessage('Error while authorizing account:')
         console.error('Error while authorizing account:', error);
       });
       
@@ -66,6 +68,11 @@ export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton) =
           setIsLoadingButton(false)
         })
         .catch(error => {
+          setIsLoadingButton(false);
+          setErrorMessage(`
+            Error while uploading file:
+            ${error}
+          `)
           console.error('Error while uploading file:', error);
         });
       }
