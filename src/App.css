@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
 * {
   padding: 0;
   margin: 0;
@@ -5,26 +7,29 @@
 }
 
 .App {
-  font-family: 'Courier New', Courier, monospace;
-  text-align: center;
+  font-family: 'Lato', sans-serif;
   color: white;
-  background-color: #555555;
+  background-color: #252f30;
   padding: 1rem;
   min-height: 100vh;
 }
 
-h2 {
+h1 {
   margin: 1rem 0;
 }
 
 a {
-  color: aqua;
+  color: #6cddcc;
+}
+
+p {
+  margin-bottom: .2rem;
 }
 
 .add-link {
-  color: aqua;
+  color: #6cddcc;
   text-decoration: none;
-  border:aqua solid 2px;
+  border:#6cddcc solid 2px;
   padding: .3rem .6rem;
   border-radius: 10px;
   
@@ -44,24 +49,18 @@ a {
 }
 
 .btn {
-  padding: .2rem .5rem;
-  background-color:aqua;
-  margin: 0 .3rem;
+  font-family: 'Lato', sans-serif;
+  font-size: .9rem;
+  padding: .4rem 1.2rem;
+  background-color:#6cddcc;
+  margin: .3rem .3rem;
   border: 0;
-  border-radius: 2px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.green {
-  background-color: rgb(142, 255, 127) !important;
-}
-
-.script-code {
-  display: inline-block;
-  padding: 1rem .8rem;
-  text-align: start;
-  background-color: black;
-  width: 60%;
+.blue {
+  background-color: rgb(127, 214, 255) !important;
 }
 
 .align {
@@ -69,17 +68,31 @@ a {
   
 }
 
+.script-code {
+  display: inline-block;
+  padding: 1rem .8rem;
+  text-align: start;
+  background-color: black;
+  width: 810px;
+}
+
 .code-container {
   overflow: auto; /* Enable horizontal and vertical scrolling if necessary */
   white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
   padding: 10px; /* Add padding for better readability */
-  border: 1px solid #ccc; /* Add a border for separation */
-  border-radius: 10px;
+
 }
 
 .center {
   display: flex;
   justify-content: center;
+}
+
+.bg-tut {
+  background-color: rgb(0, 61, 61);
+  padding: 1rem;
+  /* border-radius: 10px; */
+  width: 810px;
 }
 
 .main-content-container {
@@ -92,17 +105,30 @@ a {
   text-align: start;
 }
 
-
-
 .footer-code {
   display: inline-block;
-  background-color: rgb(46, 46, 46);
+  background-color: rgb(22, 22, 22);
   padding: 8px;
-  margin-top: .1rem;
+  margin-top: .5rem;
+  margin-bottom: 1rem;
   border-radius: 5px;
 }
 
 [disabled] {
   background-color: #c9c9c9;
   color: #464646;
+}
+
+.spreadsheet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  
+}
+
+.table-title {
+  text-align: start;
+  color: #6cddcc;
+  margin-bottom: .3rem;
 }

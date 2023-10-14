@@ -3,6 +3,7 @@ export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton, s
     
     setIsLoadingButton(true);
     setErrorMessage(null);
+    setIsHidden(true);
     const authorizationHeaders = {
         Authorization: 'Basic ' + btoa('0055c1dffd9a6620000000001:K005/rdzb3GGfdw8e+3OZMqsfP2nHd4')
       };
@@ -13,7 +14,7 @@ export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton, s
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        // console.log(data)
         const authToken = data.authorizationToken;
         const apiUrl = data.apiUrl
         fetch(`https://cors-anywhere.herokuapp.com/${apiUrl}/b2api/v2/b2_get_upload_url?bucketId=254c212d4f3f1d998ab60612`, {
@@ -24,7 +25,7 @@ export const uploadScriptToCloud = (codeText, setIsHidden, setIsLoadingButton, s
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data);
             const uploadUrl = data.uploadUrl
             const authToken = data.authorizationToken
             const bucketId = data.bucketId

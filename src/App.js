@@ -2,49 +2,33 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import Papa from 'papaparse';
 import {uploadScriptToCloud} from './storage/cloud'
+import Spreadsheet from './components/Spreadsheet';
 
 function App() {
   
   const [data, setData] = useState([]);
   const [code, setCode] = useState("");
-  const [codeText, setCodeText] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isHidden, setIsHidden] = useState(true)
-  const [isLoadingButton, setIsLoadingButton] = useState(false)
+  const [codeText, setCodeText] = useState("");
+  const [isHidden, setIsHidden] = useState(true);
+  const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  function getDataFromSheet(){
-    setIsLoading(true);
+  function getDataFromSheet(rowData){
     setIsHidden(true);
     setData([]);
     setCode("");
     setErrorMessage(null);
-    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSu2vC1xE-Zm11fwv0Nkd9r0hRqiIYCBHnPZsScIkQf_mqglwFMeSxXWRwq61-l1L4-hYzm53d8duzL/pub?gid=0&single=true&output=csv')
-    .then(response => response.text())
-    .then(data => {
-      // Parse CSV from Google Sheets
-      Papa.parse(data, {
-        header: true,
-        dynamicTyping: true,
-        complete: function (results) {
-          // 'results.data' contains the parsed CSV data as an array of objects
-          setData(results.data);
-          setIsLoading(false);
-        },
-        error: function (error) {
-          console.error('CSV parsing error:', error.message);
-        },
-      });
-      ;
+
+    const cleanedData = rowData.filter(item => {
+      return (item.name !== null && item.sshKey !== null);
     })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
+    // console.log(cleanedData);
+    setData(cleanedData);
   }
 
   function generateBashScript(data){
     generateBashScriptText(data);
-    console.log("Test", data)
+    // console.log("Test", data)
     let script = (
       <>
         <code className='script-code code-container'>
@@ -81,7 +65,7 @@ function App() {
   }
 
   function generateBashScriptText(data){
-    console.log("Test", data)
+    // console.log("Test", data)
     let script = `
 #!/bin/bash 
 ${data.map(item => (
@@ -110,7 +94,7 @@ less /etc/passwd | grep bootcamper
 
   const downloadShellScript = () => {
     generateBashScriptText(data);
-    console.log(codeText)
+    // console.log(codeText)
     const blob = new Blob([codeText], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -118,28 +102,21 @@ less /etc/passwd | grep bootcamper
     a.download = 'instructor_script.sh';
     a.click();
     window.URL.revokeObjectURL(url);
-  };
+  }
 
-  useEffect(()=>{
-    getDataFromSheet()
-  }, [])
 
   // console.log(codeText)
   return (
     <div className="App">
-      <h2>Generate Script for CSP2 Hosting (For Instructors)</h2>
+      <h1 className='align'>Generate Script for CSP2 Hosting (For Instructors)</h1>
       <br />
-      {isLoading ? 
-      <div className='container'>
-        <h4>Loading Google Sheets data...</h4>
-      </div>
-      :
-      <>
       <div className="main-content-container">
-        <a className='add-link' href="https://docs.google.com/spreadsheets/d/1pKiEQtIMg__GtYmkLzjNuNVCBBVTm_ZJgdi-tN0IdoU/edit?usp=sharing" target='_blank'>Update Bootcamper Data</a>
-        <div className='mt'>
-          <button className='btn green' onClick={getDataFromSheet}>REFRESH</button>
-          <button className='btn' onClick={() => generateBashScript(data)}><strong>GENERATE SCRIPT</strong></button>
+
+        <Spreadsheet getDataFromSheet={getDataFromSheet}/>
+        
+        <div className='mt align'>
+          {/* <button className='btn green' onClick={getDataFromSheet}>REFRESH</button> */}
+          <button className='btn blue' onClick={() => generateBashScript(data)}><strong>GENERATE SCRIPT</strong></button>
           <button className='btn' onClick={downloadShellScript}>Download script</button>
           <button className='btn' disabled={isLoadingButton ? true : false} onClick={() => uploadScriptToCloud(codeText, setIsHidden, setIsLoadingButton, setErrorMessage)}>
             {isLoadingButton ?
@@ -151,14 +128,18 @@ less /etc/passwd | grep bootcamper
         </div>
         <br />
         {!errorMessage ?
-          <code className="footer-code" style={{display: isHidden ? "none" : "inline-block"}}>curl -sSf https://f005.backblazeb2.com/file/script-aws-setup/instructor_script.sh | bash</code>
+          <div className='align'>
+            <code className="footer-code" style={{display: isHidden ? "none" : "inline-block"}}>curl -sSf https://f005.backblazeb2.com/file/script-aws-setup/instructor_script.sh | bash</code>
+          </div>
         :
-          <code className="footer-code">
-            {errorMessage} <a href="https://cors-anywhere.herokuapp.com/corsdemo" target='_blank'>Request access</a>
-          </code>
+          <div className='align'>
+            <code className="footer-code align">
+              {errorMessage} <a href="https://cors-anywhere.herokuapp.com/corsdemo" target='_blank'>Request access</a>
+            </code>
+          </div>
         }
 
-        <div className='container'>
+        <div className='container align'>
           <pre>
             {code}
           </pre>
@@ -166,17 +147,16 @@ less /etc/passwd | grep bootcamper
         </div>
       </div>
       <div className="center"> 
-        <div className="tut">
-          <h4>NOTE: If the "Get Script Link" doesn't work,</h4>
-          <h4>add the script to the remote server manually:</h4> <br />
-          <p>Download the script and open terminal to the location of instructor_script.sh</p>
+        <div className="tut bg-tut">
+          <h4>NOTE: If the "Get Script Link" doesn't work, add the script to the remote server manually:</h4> <br />
+          <p>- Download the script and open terminal from the location of instructor_script.sh</p>
           <code className="footer-code">
             scp -i ~/.ssh/zuitt_keypair_us_east2.pem instructor_script.sh ubuntu@{"<aws_server_domain_name>"}:~/
           </code>
+          <p>- Change the permission of the file to executable with <code>`chmod +x instructor_script.sh`</code></p>
+          <p>- Execute the script with <code>`./instructor_script.sh`</code>.</p>
         </div>
       </div>
-      </>
-      }
 
     </div>
   );
