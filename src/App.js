@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useRef, useState } from 'react';
 import './App.css';
 import Papa from 'papaparse';
 import {uploadScriptToCloud} from './storage/cloud'
@@ -12,12 +12,17 @@ function App() {
   const [isHidden, setIsHidden] = useState(true);
   const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isCopiedScript, setIsCopiedScript] = useState(false);
+  const [isCopiedInstall, setisCopiedInstall] = useState(false)
 
   function getDataFromSheet(rowData){
     setIsHidden(true);
     setData([]);
     setCode("");
     setErrorMessage(null);
+    setIsHidden(true);
+    setIsCopiedScript(false);
+    setisCopiedInstall(false);
 
     const cleanedData = rowData.filter(item => {
       return (item.name !== null && item.sshKey !== null);
@@ -28,6 +33,7 @@ function App() {
 
   function generateBashScript(data){
     generateBashScriptText(data);
+    setIsHidden(true);
     // console.log("Test", data)
     let script = (
       <>
@@ -62,6 +68,7 @@ function App() {
     )
 
     setCode(script);
+    alert("Setup script successfully generated!")
   }
 
   function generateBashScriptText(data){
@@ -92,7 +99,7 @@ less /etc/passwd | grep bootcamper
     setCodeText(script);
   }
 
-  const downloadShellScript = () => {
+  function downloadShellScript(){
     generateBashScriptText(data);
     // console.log(codeText)
     const blob = new Blob([codeText], { type: 'text/plain' });
@@ -102,6 +109,47 @@ less /etc/passwd | grep bootcamper
     a.download = 'instructor_script.sh';
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  const sshScriptCodeRef = useRef(null);
+  const manualInstallCodeRef = useRef(null);
+  function copyToClipboard(type){
+    let codeElement;
+    if(type === 1){
+      codeElement = sshScriptCodeRef.current;
+    } else if(type === 2){
+      codeElement = manualInstallCodeRef.current;
+    } else {
+      return alert("Error copying to clipboard");
+    }
+
+    console.log(codeElement)
+    const range = document.createRange();
+    range.selectNode(codeElement);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+
+    try {
+      document.execCommand("copy");
+      if(type === 1) {
+        setIsCopiedScript(true);
+      }
+      if(type === 2){
+        setisCopiedInstall(true);
+      }
+    } catch (err) {
+      console.error("Unable to copy to clipboard");
+      alert("Error copying to clipboard");
+    } finally {
+      window.getSelection().removeAllRanges();
+    }
+  };
+
+  function resetCopyClipboardBtn(){
+    setTimeout(() => {
+      setIsCopiedScript(false);
+      setisCopiedInstall(false);
+    }, 5000)
   }
 
 
@@ -118,7 +166,10 @@ less /etc/passwd | grep bootcamper
           {/* <button className='btn green' onClick={getDataFromSheet}>REFRESH</button> */}
           <button className='btn blue' onClick={() => generateBashScript(data)}><strong>GENERATE SCRIPT</strong></button>
           <button className='btn' onClick={downloadShellScript}>Download script</button>
-          <button className='btn' disabled={isLoadingButton ? true : false} onClick={() => uploadScriptToCloud(codeText, setIsHidden, setIsLoadingButton, setErrorMessage)}>
+          <button className='btn' disabled={isLoadingButton ? true : false} onClick={() => {
+            uploadScriptToCloud(codeText, setIsHidden, setIsLoadingButton, setErrorMessage)
+            setIsCopiedScript(false);
+          }}>
             {isLoadingButton ?
               "Generating link..."
             :
@@ -129,7 +180,20 @@ less /etc/passwd | grep bootcamper
         <br />
         {!errorMessage ?
           <div className='align'>
-            <code className="footer-code" style={{display: isHidden ? "none" : "inline-block"}}>curl -sSf https://f005.backblazeb2.com/file/script-aws-setup/instructor_script.sh | bash</code>
+            <div className="footer-code" style={{display: isHidden ? "none" : "inline-block"}} >
+              <code ref={sshScriptCodeRef}>
+                curl -sSf https://f005.backblazeb2.com/file/script-aws-setup/instructor_script.sh | bash 
+              </code>
+
+              {isCopiedScript ?
+                  <button className='copy-ok'>✔</button>
+                  :
+                  <button className='copy-btn' onClick={() => {
+                    copyToClipboard(1)
+                    resetCopyClipboardBtn()
+                  }}>copy</button>
+              }
+            </div>
           </div>
         :
           <div className='align'>
@@ -150,9 +214,22 @@ less /etc/passwd | grep bootcamper
         <div className="tut bg-tut">
           <h4>NOTE: If the "Get Script Link" doesn't work, add the script to the remote server manually:</h4> <br />
           <p>- Download the script and open terminal from the location of instructor_script.sh</p>
-          <code className="footer-code">
-            scp -i ~/.ssh/zuitt_keypair_us_east2.pem instructor_script.sh ubuntu@{"<aws_server_domain_name>"}:~/
-          </code>
+          <div className='align'>
+            <div className="footer-code" >
+              <code ref={manualInstallCodeRef}>
+                scp -i ~/.ssh/zuitt_keypair_us_east2.pem instructor_script.sh ubuntu@{"<aws_server_domain_name>"}:~/
+              </code>
+              {isCopiedInstall ?
+                <button className='copy-ok'>✔</button>
+                :
+                <button className='copy-btn' onClick={() => {
+                  copyToClipboard(2);
+                  resetCopyClipboardBtn();
+                }}>copy</button>
+              }
+            </div>
+          </div>
+          
           <p>- Change the permission of the file to executable with <code>`chmod +x instructor_script.sh`</code></p>
           <p>- Execute the script with <code>`./instructor_script.sh`</code>.</p>
         </div>

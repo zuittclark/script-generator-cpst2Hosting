@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-enterprise';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
-import 'ag-grid-enterprise';
 
 const Spreadsheet = ({getDataFromSheet}) => {
 
   const columnDefs = [
-    { headerName: 'No.', field: 'id', width: 70 },
-    { headerName: 'Name', field: 'name', editable: true, width: 200 },
-    { headerName: 'SSH Key', field: 'sshKey', editable: true, width: 530 },
+    { headerName: 'No.', field: 'id', width: 80 },
+    { headerName: 'Name', field: 'name', editable: true, width: 250 },
+    { headerName: 'SSH Key', field: 'sshKey', editable: true, width: 567 },
   ];
 
   const sampleKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0iZ2zcxo1q9d1PXwys3g1bmR3tLoz4Aq6KU+1eDZM5VShmc+MweE4p4dA2k02DyKv8bXPhzMREpJ7L/4y7aCz3VVKC0B/XgCIiNQZ4LONRmX8kJH0Wppu8NQPOZBfNjTKlZ5NlLi9J15JbYpU3+Xym4Cot1E5uCCa0qRBbV5Wia7W25Bq6LG2Cf1b6TE+JjXp2kJwB/DrX9vB7Df1Aar8TdrhABuLM43sLXek6ctL3YXjyQio1jA5ovjYz6A4bmkwnWW4nRi+D33KGS6O2WXWRs0vl6brZIQ1iMIKzSmUSFh6zV8UoQnoKzDbCK1KrRpQmyG4+PMrkE2y4mYS0HXaBCy3 username@hostname'
@@ -49,7 +49,7 @@ const Spreadsheet = ({getDataFromSheet}) => {
 
   return (
     <div className='spreadsheet'>
-        <div className="ag-theme-balham-dark" style={{ height: 350, width: 810 }}>
+        <div className="ag-theme-balham-dark" style={{ height: 350, width: 900 }}>
         <h2 className='table-title'>ADD BOOTCAMPER DATA</h2>
         <AgGridReact
             columnDefs={columnDefs}
